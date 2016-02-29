@@ -72,13 +72,13 @@ void loop()
     
     //make and array that stores the Li instantanous sound pressure level. pi is the rms of the voltage signal p0 is the constant
     //Find the equivalent level at the moment of done comparing for i = 1 to n
-    //
     //this will take the leq at the current time based on the array of ISPL
     for (int i = 0; i < counter; i++)
     {
       LeqSumStudent += pow(10,StudentISPL[i]/10);
       LeqSumTeacher += pow(10,TeacherISPL[i]/10);
     }
+    //not sure if this is right. Will need to resolve <--
     float TimeStep = .02;
     float DT = .02/20;
     TeacherLeq = 10 * log10(TimeStep/DT * LeqSumTeacher); //Equivalent level at the end of 20 ms
@@ -91,8 +91,8 @@ void loop()
   //do the comparison of leq
   //if greater than threshold than we start over
   //if not greater, then we do processing until it it over
-  
   //Arbitrary number of 10
+  //not sure if this is right. Will need to resolve <--
   float LeqDifference = TeacherLeq - StudentLeq;
   if (LeqDifference > 30)
   {
