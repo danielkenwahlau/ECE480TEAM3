@@ -32,6 +32,7 @@ void setup()
 }
 void loop()
 {
+
   float TeacherNoise[SampleArraySize];
   float StudentNoise[SampleArraySize];
   float TeacherLeq;
