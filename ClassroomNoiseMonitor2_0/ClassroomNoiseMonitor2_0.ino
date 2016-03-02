@@ -1,24 +1,24 @@
 //Classroom Noise Monitor 2.0
 
+
 int counterHistory;
 int historyArray[25];
 int historySum;
-const int sampleWindow = 20; // Sample window width in mS (50 mS = 20Hz)
-float sample;
-float sample2;
-unsigned int counter;
-unsigned int counter2;
-float tmean;
-float smean;
-float tsize;
-float ssize;
-float trms = 0;
-float srms = 0;
-float teachavgvoltarray[24];
-float studentavgvolt;
-float snr;
+const int sampleWindow = 20;       // Sample window width in mS (50 mS = 20Hz)
+const int SampleArraySize = 80;       // Max size of sample array
+float TeacherSample;          // Raw Quantized Sample from teacher mic
+float StudentSample;          // Raw Quantized Sample from student mic  
+unsigned int SampleNumber;        //represents the sample number that we are on
+float TeacherAvgVoltArray[24];
+float StudentAvgVolt;
+float Snr;
+float TeacherISPL[SampleArraySize];
+float StudentISPL[SampleArraySize];
+float ReferenceSoundPower = 0.000002;   //2E-6
 int counter3 = 0;
-float tavgsum = 0;
+float TeacherAvgSum = 0;
+
+
 void setup()
 {
   Serial.begin(9600);
@@ -32,84 +32,82 @@ void setup()
 }
 void loop()
 {
-  float tnoise[80];
-  float snoise[80];
-  int counter = 0;
-  int counter2 = 0;
-  float summation = 0;
-  float summation2 = 0;
-  unsigned long startMillis = millis(); // Start of sample window
+
+  float TeacherNoise[SampleArraySize];
+  float StudentNoise[SampleArraySize];
+  float TeacherLeq;
+  float StudentLeq;
+  int SampleNumber = 0;
+  float TeacherSummation = 0;
+  float StudentSummation = 0;
+  float LeqSumStudent = 0;
+  float LeqSumTeacher = 0;
+  unsigned long startMillis = millis(); // Start of TeacherSample window
   // collect data for 20 ms
   while (millis() - startMillis < sampleWindow)
   {
-    if (counter < ssize) // toss out spurious readings
+      TeacherSample = analogRead(0); //TeacherSample from the teacher mic
+      TeacherNoise[SampleNumber] = abs((TeacherSample * 5) / 1024 - 1.65); //convert teachmic info to voltage
+      StudentSample = analogRead(1); //TeacherSample from the student mic
+      StudentNoise[SampleNumber] = abs((StudentSample * 5) / 1024 - 1.65); //convert stumic info to voltage
+    
+    //Should we be using this since it gives the RMS over a period of time vs the ISPL?
+      StudentSummation = StudentSummation + StudentNoise[SampleNumber] * StudentNoise[SampleNumber];//calculating the summation for RMS of Student
+      TeacherSummation = TeacherSummation + TeacherNoise[SampleNumber] * TeacherNoise[SampleNumber]; //calculating the summation for RMS of Teacher
+    
+  //Either we use this or RMS voltage
+    TeacherISPL[SampleNumber] = 20 * log10(TeacherNoise[SampleNumber] / ReferenceSoundPower); //Instantaneous Sound pressure level of teacher aka SNR for teacher
+    StudentISPL[SampleNumber] = 20 * log10(StudentNoise[SampleNumber] / ReferenceSoundPower); //Instantaneous Sound pressure level of students aka SNR for student
+    
+    
+    //make and array that stores the Li instantanous sound pressure level. pi is the rms of the voltage signal p0 is the constant
+    //Find the equivalent level at the moment of done comparing for i = 1 to n
+    //this will take the leq at the current time based on the array of ISPL
+    for (int i = 0; i < SampleNumber; i++)
     {
-      sample = analogRead(0); //sample from the teacher mic
-      if (abs(sample * 5 / 1024) > .001)//ignore silent samples
-      {
-        tnoise[counter2] = abs((sample * 5) / 1024 - 1.65); //convert teachmic info to voltage
-        counter2++;
-      }
-      sample2 = analogRead(1); //sample from the student mic
-      snoise[counter] = abs((sample2 * 5) / 1024 - 1.65); //convert stumic info to voltage
-      summation2 = summation2 + snoise[counter] * tnoise[counter];//calculate student rms
-      summation = summation + tnoise[counter] * tnoise[counter]; //calculate teacher rms
-      counter++;
+      LeqSumStudent += pow(10,StudentISPL[i]/10);
+      LeqSumTeacher += pow(10,TeacherISPL[i]/10);
     }
+    
+    //Basically and average over the number of samples
+    TeacherLeq = 10 * log10(1/SampleNumber * LeqSumTeacher); //Equivalent level at the end of 20 ms
+    StudentLeq = 10 * log10(1/SampleNumber * LeqSumStudent); //Equivalent level at the end of 20 ms
+    
+    SampleNumber++;
   }
-  int n = 0;
-  tsize = counter2;
-  ssize = sizeof(snoise) / sizeof(float);
-  trms = summation / tsize;
-  srms = summation2 / ssize;
-  snr = 20 * log10(trms / srms);
-  //history buffer
-  if (snr > 6)
+  
+  //do the comparison of leq
+  //if greater than threshold than we start over
+  //if not greater, then we do processing until it it over
+  //Arbitrary number of 10
+  //not sure if this is right. Will need to resolve <--
+  float LeqDifference = TeacherLeq - StudentLeq;
+  if (LeqDifference > 30)
   {
-    historyArray[counterHistory] = 0;
-  }
-  else if ((snr <= 6) && (snr >= -2))
-  {
-    historyArray[counterHistory] = 1;
-  }
-  else if (20 * log10(studentavgvolt / .00002)>95)
-  {
-    historyArray[counterHistory] = 2;
-  }
+    //Nothing is to be done and the loop continues
+  }   
   else
   {
-    historyArray[counterHistory] = 2;
-  }
-  //increment history counter
-  counterHistory++;
-  //reset history counter to front
-  if (counterHistory > 24)
-  {
-    counterHistory = 0;
-  }
-  historySum = 0;
-  for (int j = 0; j < 25; j++)
-  {
-    historySum += historyArray[j];
-  }
-  //LED activation
-  if (historySum <= 30)
-  {
+      //LED activation
+    if (LeqDifference <= 30)
+    {
     digitalWrite(11, HIGH);
     digitalWrite(12, LOW);
     digitalWrite(13, LOW);
-  }
-  else if ((historySum > 38) && (historySum <= 45))
-  {
+    }
+    else if ((LeqDifference > 38) && (LeqDifference <= 45))
+    {
     digitalWrite(11, LOW);
     digitalWrite(12, HIGH);
     digitalWrite(13, LOW);
-  }
-  else
-  {
+    }
+    else
+    {
     digitalWrite(11, LOW);
     digitalWrite(12, LOW);
     digitalWrite(13, HIGH);
+    }   
   }
+
 }
 
