@@ -2,13 +2,13 @@
 
 const int sampleWindow = 2000;       // Sample window width in mS (50 mS = 20Hz)
 const int SampleArraySize = 80;       // Max size of sample array
-int TeacherMicThreshold = 30;			//Threshold used to compare if the teacher is talking or not (Must be tuned)
+int TeacherMicThreshold = 10000;			//Threshold used to compare if the teacher is talking or not (Must be tuned)
 float ReferenceSoundPower = 0.000002;   //2E-6
 int counter3 = 0;
 float TeacherAvgSum = 0;
 float ThresholdA = 30;				//Threshold between green and yellow
 float ThresholdB = 38;				//Threshold between yellow and Red
-
+float constant = 50;				//For future use this is the number we will have to adjust when live signal testing
 
 
 void setup()
@@ -17,9 +17,9 @@ void setup()
 	pinMode(11, OUTPUT); //GREEN
 	pinMode(12, OUTPUT); //YELLOW
 	pinMode(13, OUTPUT); //RED
-	digitalWrite(11, HIGH);
-	digitalWrite(12, HIGH);
-	digitalWrite(13, HIGH);
+	digitalWrite(11, LOW);
+	digitalWrite(12, LOW);
+	digitalWrite(13, LOW);
 	analogReference(DEFAULT);
 }
 void loop()
@@ -46,22 +46,22 @@ void loop()
 		TeacherVoltage = abs((TeacherSample * 5) / 1024 - 1.65); //convert teachmic info to voltage
 
 		//Instantaneous Sound pressure level of teacher aka SNR for teacher
-		TeacherISPL = 20 * log10(TeacherVoltage / ReferenceSoundPower);
+		TeacherISPL = 20 * log10(TeacherVoltage / ReferenceSoundPower) + constant; //
 
 		//while the ISPL of the teacher is below a certain level, start taking samples from the student mic
 
 		//keeps track of the number of samples taken in the time that the teacher was not talking
 		Samples = 0;
-		while (TeacherISPL < 30)
+		while (TeacherISPL < TeacherMicThreshold)
 		{
 			StudentSample = analogRead(1); //TeacherSample from the student mic
 			StudentVoltage = abs((StudentSample * 5) / 1024 - 1.65); //convert stumic info to 
-			StudentISPL[Samples] = 20 * log10(StudentVoltage / ReferenceSoundPower); //Instantaneous Sound pressure level of students aka SNR for student
+			StudentISPL[Samples] = 20 * log10(StudentVoltage / ReferenceSoundPower) + constant; //Instantaneous Sound pressure level of students aka SNR for student
 
 			//Check if the teacher is talking or not
 			TeacherSample = analogRead(0);
 			TeacherVoltage = abs((TeacherSample * 5) / 1024 - 1.65);
-			TeacherISPL = 20 * log10(TeacherVoltage / ReferenceSoundPower);
+			TeacherISPL = 20 * log10(TeacherVoltage / ReferenceSoundPower) + constant;
 
 			Samples++;
 		}
@@ -101,4 +101,3 @@ void loop()
 	}
 
 }
-
