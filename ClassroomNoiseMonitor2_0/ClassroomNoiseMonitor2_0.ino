@@ -2,13 +2,15 @@
 
 const int sampleWindow = 1000;       // Sample window width in mS (50 mS = 20Hz)
 const int SampleArraySize = 80;       // Max size of sample array
-float TeacherMicThreshold = 63.5;      //Threshold used to compare if the teacher is talking or not (Must be tuned)
-float ReferenceSoundPower = 0.2;
+float TeacherMicThreshold = 65.5;      //Threshold used to compare if the teacher is talking or not (Must be tuned)
+float ReferenceSoundPower = 0.0002;
 int counter3 = 0;
 float TeacherAvgSum = 0;
-float ThresholdA = 31;        //Threshold between green and yellow
-float ThresholdB = 38;        //Threshold between yellow and Red
-float constant = 50;        //For future use this is the number we will have to adjust when live signal testing
+float ThresholdA = 36;        //Threshold between green and yellow
+float ThresholdB = 39;        //Threshold between yellow and Red
+float constant1 = -27;
+float constant2 = 0;
+float maxvalue = 0;
 
 
 void setup()
@@ -40,16 +42,17 @@ void loop()
 
   unsigned long startMillis = millis(); // Start of TeacherSample window
   // collect data for 2000 ms or two seconds
-    Serial.println("starting");
+//    Serial.println("starting");
   while (millis() - startMillis < sampleWindow)
   {
 
     TeacherSample = analogRead(0); //TeacherSample from the teacher mic
+Serial.println(TeacherSample);    
     TeacherVoltage = abs((TeacherSample * 5) / 1024 - 1.65); //convert teachmic info to voltage
 
 
     //Instantaneous Sound pressure level of teacher aka SNR for teacher
-    TeacherISPL = 20 * log10(TeacherVoltage / ReferenceSoundPower) + constant; //
+    TeacherISPL = 20 * log10(TeacherVoltage / ReferenceSoundPower) + constant1; //
 
     //while the ISPL of the teacher is below a certain level, start taking samples from the student mic
 
@@ -57,25 +60,33 @@ void loop()
 
     //keeps track of the number of samples taken in the time that the teacher was not talking
     Samples = 0;
-        Serial.println(TeacherISPL);
-    while (TeacherISPL < TeacherMicThreshold)
-    {
-      StudentSample = analogRead(1); //TeacherSample from the student mic
-      StudentVoltage = abs((StudentSample * 5) / 1024 - 1.65); //convert stumic info to
-      StudentISPL[Samples] = 20 * log10(StudentVoltage / ReferenceSoundPower) + constant; //Instantaneous Sound pressure level of students aka SNR for student
+//    Serial.println(TeacherVoltage);
 
-      //      Serial.println(20 * log10(StudentVoltage / ReferenceSoundPower));
-
-                  Serial.println("active sampling");
-
-      //Check if the teacher is talking or not
-      TeacherSample = analogRead(0);
-      TeacherVoltage = abs((TeacherSample * 5) / 1024 - 1.65);
-      TeacherISPL = 20 * log10(TeacherVoltage / ReferenceSoundPower) + constant;
-
-      Samples++;
-
-    }
+    //printing test
+//    Serial.println(TeacherISPL);
+//    if(TeacherVoltage>=maxvalue)
+//    {
+//      Serial.println(maxvalue);
+//      maxvalue = TeacherVoltage;
+//    }
+//    while (TeacherISPL < TeacherMicThreshold)
+//    {
+//      StudentSample = analogRead(1); //TeacherSample from the student mic
+//      StudentVoltage = abs((StudentSample * 5) / 1024 - 1.65); //convert stumic info to
+//      StudentISPL[Samples] = 20 * log10(StudentVoltage / ReferenceSoundPower) + constant2; //Instantaneous Sound pressure level of students aka SNR for student
+//
+//      //      Serial.println(20 * log10(StudentVoltage / ReferenceSoundPower));
+//
+////                  Serial.println("active sampling");
+//
+//      //Check if the teacher is talking or not
+//      TeacherSample = analogRead(0);
+//      TeacherVoltage = abs((TeacherSample * 5) / 1024 - 1.65);
+//      TeacherISPL = 20 * log10(TeacherVoltage / ReferenceSoundPower) + constant1;
+//
+//      Samples++;
+//
+//    }
     //    for(int i = 0; i<Samples; i++)
     //    {
     //      Serial.print(StudentISPL[i]);
@@ -108,7 +119,7 @@ void loop()
     }
     else
     {
-      LeqTotal = 31;
+      LeqTotal = 35;
     }
     
 //  Serial.println("end loop");
@@ -122,11 +133,11 @@ void loop()
 
 //    LeqAverage = LeqTotal / NumStudentWindows;
     LeqAverage = LeqTotal;//for testing
-      Serial.print("+++++++++++++++");
-      Serial.println(LeqAverage);
+//      Serial.print("+++++++++++++++");
+//      Serial.println(LeqAverage);
     
 
-    Serial.println(LeqTotal);
+//    Serial.println(LeqTotal);
 //    Serial.println(NumStudentWindows);
     NumStudentWindows = 0;
   //

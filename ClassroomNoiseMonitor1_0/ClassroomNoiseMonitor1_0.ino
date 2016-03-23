@@ -47,12 +47,14 @@ void loop()
     if (counter < ssize) // toss out spurious readings
     {
       sample = analogRead(0); //sample from the teacher mic
+      
       if (abs(sample * 5 / 1024) > .001)//ignore silent samples
       {
         tnoise[counter2] = abs((sample * 5) / 1024 - 1.65); //convert teachmic info to voltage
         counter2++;
       }
       sample2 = analogRead(1); //sample from the student mic
+      
       snoise[counter] = abs((sample2 * 5) / 1024 - 1.65); //convert stumic info to voltage
       summation2 = summation2 + snoise[counter] * tnoise[counter];//calculate student rms
       summation = summation + tnoise[counter] * tnoise[counter]; //calculate teacher rms
@@ -63,6 +65,7 @@ void loop()
   tsize = counter2;
   ssize = sizeof(snoise) / sizeof(float);
   trms = summation / tsize;
+  Serial.println(trms);
   srms = summation2 / ssize;
   snr = 20 * log10(trms / srms);
   //history buffer
