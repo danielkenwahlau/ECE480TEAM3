@@ -4,7 +4,7 @@ const int sampleWindow = 1000;       // Sample window width in mS (50 mS = 20Hz)
 const int SampleArraySize = 80;       // Max size of sample array
 float TeacherMicThreshold = 65.5;      //Threshold used to compare if the teacher is talking or not (Must be tuned)
 float ReferenceSoundPower = 0.00025;
-float ReferenceSoundPowerStudent = 0.000015;
+float ReferenceSoundPowerStudent = 0.00001;
 int counter3 = 0;
 float TeacherAvgSum = 0;
 float ThresholdA = 36;        //Threshold between green and yellow
