@@ -3,7 +3,8 @@
 const int sampleWindow = 1000;       // Sample window width in mS (50 mS = 20Hz)
 const int SampleArraySize = 80;       // Max size of sample array
 float TeacherMicThreshold = 65.5;      //Threshold used to compare if the teacher is talking or not (Must be tuned)
-float ReferenceSoundPower = 0.0002;
+float ReferenceSoundPower = 0.00025;
+float ReferenceSoundPowerStudent = 0.000015;
 int counter3 = 0;
 float TeacherAvgSum = 0;
 float ThresholdA = 36;        //Threshold between green and yellow
@@ -33,6 +34,7 @@ void loop()
   float LeqSumTeacher = 0;
   unsigned int Samples = 0;        //represents the sample number that we are on
   float TeacherISPL = 0;
+  float StudentISPLTest = 0;
   float StudentISPL[SampleArraySize];
   double LeqTotal = 0;
   float LeqAverage = 0;
@@ -46,14 +48,13 @@ void loop()
   while (millis() - startMillis < sampleWindow)
   {
 
-    TeacherSample = analogRead(0); //TeacherSample from the teacher mic
-Serial.println(TeacherSample);    
-    TeacherVoltage = abs((TeacherSample * 5) / 1024 - 1.65); //convert teachmic info to voltage
-
-
-    //Instantaneous Sound pressure level of teacher aka SNR for teacher
-    TeacherISPL = 20 * log10(TeacherVoltage / ReferenceSoundPower) + constant1; //
-
+//    TeacherSample = analogRead(0); //TeacherSample from the teacher mic
+// 
+//    TeacherVoltage = abs((TeacherSample * 5) / 1024 - 2.6); //convert teachmic info to voltage
+//
+//    //Instantaneous Sound pressure level of teacher aka SNR for teacher
+//    TeacherISPL = 20 * log10(TeacherVoltage / ReferenceSoundPower); //
+//Serial.println(TeacherISPL);
     //while the ISPL of the teacher is below a certain level, start taking samples from the student mic
 
 
@@ -64,17 +65,28 @@ Serial.println(TeacherSample);
 
     //printing test
 //    Serial.println(TeacherISPL);
-//    if(TeacherVoltage>=maxvalue)
+//    if(TeacherISPL>=maxvalue)
 //    {
-//      Serial.println(maxvalue);
-//      maxvalue = TeacherVoltage;
+//      Serial.println(TeacherISPL);
+//      maxvalue = TeacherISPL;
 //    }
 //    while (TeacherISPL < TeacherMicThreshold)
 //    {
-//      StudentSample = analogRead(1); //TeacherSample from the student mic
-//      StudentVoltage = abs((StudentSample * 5) / 1024 - 1.65); //convert stumic info to
+      StudentSample = analogRead(1); //TeacherSample from the student mic
+      
+      StudentVoltage = abs((StudentSample * 5) / 1024 - 2.5); //convert stumic info to
+//      Serial.println(StudentVoltage);
 //      StudentISPL[Samples] = 20 * log10(StudentVoltage / ReferenceSoundPower) + constant2; //Instantaneous Sound pressure level of students aka SNR for student
-//
+//***********
+  StudentISPLTest = 20 * log10(StudentVoltage / ReferenceSoundPowerStudent); //Instantaneous Sound pressure level of students aka SNR for student
+Serial.println(StudentISPLTest);
+//    if(StudentISPLTest>=maxvalue)
+//    {
+//      Serial.println(StudentISPLTest);
+//      maxvalue = StudentISPLTest;
+//    }
+//***********
+
 //      //      Serial.println(20 * log10(StudentVoltage / ReferenceSoundPower));
 //
 ////                  Serial.println("active sampling");
@@ -143,13 +155,31 @@ Serial.println(TeacherSample);
   //
   //
     //LED activation
-    if (LeqAverage <= ThresholdA)
+//    if (LeqAverage <= ThresholdA)
+//    {
+//      digitalWrite(11, HIGH);
+//      digitalWrite(12, LOW);
+//      digitalWrite(13, LOW);
+//    }
+//    else if ((LeqAverage > ThresholdA) && (LeqAverage <= ThresholdB))
+//    {
+//      digitalWrite(11, LOW);
+//      digitalWrite(12, HIGH);
+//      digitalWrite(13, LOW);
+//    }
+//    else
+//    {
+//      digitalWrite(11, LOW);
+//      digitalWrite(12, LOW);
+//      digitalWrite(13, HIGH);
+//    }
+    if (TeacherISPL<= ThresholdA)
     {
       digitalWrite(11, HIGH);
       digitalWrite(12, LOW);
       digitalWrite(13, LOW);
     }
-    else if ((LeqAverage > ThresholdA) && (LeqAverage <= ThresholdB))
+    else if ((TeacherISPL > ThresholdA) && (TeacherISPL <= ThresholdB))
     {
       digitalWrite(11, LOW);
       digitalWrite(12, HIGH);
