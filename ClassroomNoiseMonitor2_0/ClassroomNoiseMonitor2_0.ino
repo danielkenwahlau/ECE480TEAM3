@@ -152,34 +152,16 @@ Serial.println(StudentISPLTest);
 //    Serial.println(LeqTotal);
 //    Serial.println(NumStudentWindows);
     NumStudentWindows = 0;
-  //
-  //
-    //LED activation
-//    if (LeqAverage <= ThresholdA)
-//    {
-//      digitalWrite(11, HIGH);
-//      digitalWrite(12, LOW);
-//      digitalWrite(13, LOW);
-//    }
-//    else if ((LeqAverage > ThresholdA) && (LeqAverage <= ThresholdB))
-//    {
-//      digitalWrite(11, LOW);
-//      digitalWrite(12, HIGH);
-//      digitalWrite(13, LOW);
-//    }
-//    else
-//    {
-//      digitalWrite(11, LOW);
-//      digitalWrite(12, LOW);
-//      digitalWrite(13, HIGH);
-//    }
-    if (TeacherISPL<= ThresholdA)
+  
+  
+    LED activation
+    if (LeqAverage <= ThresholdA)
     {
       digitalWrite(11, HIGH);
       digitalWrite(12, LOW);
       digitalWrite(13, LOW);
     }
-    else if ((TeacherISPL > ThresholdA) && (TeacherISPL <= ThresholdB))
+    else if ((LeqAverage > ThresholdA) && (LeqAverage <= ThresholdB))
     {
       digitalWrite(11, LOW);
       digitalWrite(12, HIGH);
