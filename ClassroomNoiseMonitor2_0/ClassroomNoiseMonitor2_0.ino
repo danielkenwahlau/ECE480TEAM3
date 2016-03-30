@@ -9,7 +9,7 @@ int counter3 = 0;
 float TeacherAvgSum = 0;
 float ThresholdA = 36;        //Threshold between green and yellow
 float ThresholdB = 39;        //Threshold between yellow and Red
-float constant1 = -27;
+float constantTeacher = 6.33;
 float constant2 = 0;
 float maxvalue = 0;
 
@@ -48,13 +48,13 @@ void loop()
   while (millis() - startMillis < sampleWindow)
   {
 
-//    TeacherSample = analogRead(0); //TeacherSample from the teacher mic
-// 
-//    TeacherVoltage = abs((TeacherSample * 5) / 1024 - 2.6); //convert teachmic info to voltage
-//
-//    //Instantaneous Sound pressure level of teacher aka SNR for teacher
-//    TeacherISPL = 20 * log10(TeacherVoltage / ReferenceSoundPower); //
-//Serial.println(TeacherISPL);
+    TeacherSample = analogRead(0); //TeacherSample from the teacher mic
+ 
+    TeacherVoltage = abs((TeacherSample * 5) / 1024 - 2.6); //convert teachmic info to voltage
+
+    //Instantaneous Sound pressure level of teacher aka SNR for teacher
+    TeacherISPL = 20 * log10(TeacherVoltage / ReferenceSoundPower) + constantTeacher; //
+    Serial.println(TeacherISPL);
     //while the ISPL of the teacher is below a certain level, start taking samples from the student mic
 
 
@@ -78,8 +78,8 @@ void loop()
 //      Serial.println(StudentVoltage);
 //      StudentISPL[Samples] = 20 * log10(StudentVoltage / ReferenceSoundPower) + constant2; //Instantaneous Sound pressure level of students aka SNR for student
 //***********
-  StudentISPLTest = 20 * log10(StudentVoltage / ReferenceSoundPowerStudent); //Instantaneous Sound pressure level of students aka SNR for student
-Serial.println(StudentISPLTest);
+  StudentISPLTest = 20 * log10(StudentVoltage / ReferenceSoundPower); //Instantaneous Sound pressure level of students aka SNR for student
+//Serial.println(StudentISPLTest);
 //    if(StudentISPLTest>=maxvalue)
 //    {
 //      Serial.println(StudentISPLTest);
@@ -154,7 +154,7 @@ Serial.println(StudentISPLTest);
     NumStudentWindows = 0;
   
   
-    LED activation
+//    LED activation
     if (LeqAverage <= ThresholdA)
     {
       digitalWrite(11, HIGH);
