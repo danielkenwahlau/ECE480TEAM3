@@ -46,29 +46,30 @@ void loop()
   TRMS += sq(TeacherVoltage); //convert teachmic info to voltage
   counter++;
 //
-//  StudentSample = analogRead(1); //TeacherSample from the student mic
+  StudentSample = analogRead(1); //TeacherSample from the student mic
 ////  Serial.print(StudentSample);
 ////Serial.print("\t");
 //
-////  StudentVoltage = abs((StudentSample * 5) / 1024 - 2.5)*2; //convert stumic info to
-//  StudentVoltage = (StudentSample * 5) / 1024 - 2.5; //convert stumic info to
-//  SRMS += sq(StudentVoltage); //convert Student info to voltage
+  StudentVoltage = abs((StudentSample * 5) / 1024 - 2.5)*2; //convert stumic info to
+  StudentVoltage = (StudentSample * 5) / 1024 - 2.5; //convert stumic info to
+  SRMS += sq(StudentVoltage); //convert Student info to voltage
 ////  //      Serial.println(StudentVoltage);
 //
 
   }
-  TRMS = sqrt(TRMS/counter);
-  Serial.print(TRMS);
-Serial.print("\t");
-
-//  SRMS = sqrt(SRMS/counter);
-//    Serial.print(SRMS);
+  //TRMS = sqrt(TRMS/counter);
+  //Serial.print(TRMS);
 //Serial.print("\t");
+
+  SRMS = sqrt(SRMS/counter);
+    Serial.print(SRMS);
+Serial.print("\t");
 
   TeacherISPL = 20 * log10(TRMS / ReferenceSoundPower) + constant1;
   StudentISPLTest = 20 * log10(SRMS / ReferenceSoundPower) + constant2; //Instantaneous Sound pressure level of students aka SNR for student
-  Serial.println(TeacherISPL);
-//  Serial.println(StudentISPLTest);
+  //Serial.println(TeacherISPL);
+  StudentISPLTest = pow((StudentISPLTest - 30),1.09);
+  Serial.println(StudentISPLTest);
   counter=0;
 }
 

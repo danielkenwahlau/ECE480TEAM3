@@ -1,4 +1,4 @@
-const int sampleWindow = 10; // Sample window width in mS (50 mS = 20Hz)
+const int sampleWindow = 50; // Sample window width in mS (50 mS = 20Hz)
 unsigned int sample;
  
 void setup() 
