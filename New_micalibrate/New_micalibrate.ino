@@ -84,6 +84,25 @@ void loop()
         Serial.println(pow(StudentISPLTest,1.09));
         Serial.println("fafafafa");
       }
+      
+       if(StudentISPLFinal <= 65){
+          digitalWrite(11, HIGH);
+          digitalWrite(12, LOW);
+          digitalWrite(13, LOW);
+          delay(750);
+       }
+       else if ((StudentISPLFinal > 65) && (StudentISPLFinal < 70)){
+          digitalWrite(11, LOW);
+          digitalWrite(12, HIGH);
+          digitalWrite(13, LOW);
+          delay(750);
+       }
+       else{
+          digitalWrite(11, LOW);
+          digitalWrite(12, LOW);
+          digitalWrite(13, HIGH);
+          delay(750);
+       }
       /*while(num<200){
         num++;
         accume += StudentISPLTest;
@@ -128,21 +147,7 @@ void loop()
 
   
 
- if(StudentISPLFinal <= 60){
-    digitalWrite(11, HIGH);
-    digitalWrite(12, LOW);
-    digitalWrite(13, LOW);
- }
- else if ((StudentISPLFinal > 60) && (StudentISPLFinal < 65)){
-    digitalWrite(11, LOW);
-    digitalWrite(12, HIGH);
-    digitalWrite(13, LOW);
- }
- else{
-    digitalWrite(11, LOW);
-    digitalWrite(12, LOW);
-    digitalWrite(13, HIGH);
- }
+
   /*while(num<200){
     
     num++;
