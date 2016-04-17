@@ -74,7 +74,7 @@ void loop()
       StudentISPLTest = ((StudentISPLTest - 30));
       counter=0;
       
-      if(StudentISPLTest < 40){
+      if(StudentISPLTest <= 40){
         Serial.println(pow(StudentISPLTest,1.075));
         StudentISPLFinal = pow(StudentISPLTest,1.075);
         Serial.println("hahahaha");
