@@ -1,7 +1,7 @@
 
-float TeacherMicThreshold = 85;      //Threshold used to compare if the teacher is talking or not (Must be tuned)
+float TeacherMicThreshold = 78;      //Threshold used to compare if the teacher is talking or not (Must be tuned)
 float ReferenceSoundPower = 0.0000259;
-float constant1 = 12;
+float constant1 = 2;
 float constant2 = 7;
 float maxvalue = 8;
 float constant = 60;
@@ -82,27 +82,28 @@ void loop()
       else{
         StudentISPLFinal = pow(StudentISPLTest,1.09);
         Serial.println(pow(StudentISPLTest,1.09));
-        Serial.println("fafafafa");
+        Serial.println("Detecting student noise");
       }
       
-       if(StudentISPLFinal <= 65){
+       if(StudentISPLFinal <= 55){
           digitalWrite(11, HIGH);
           digitalWrite(12, LOW);
           digitalWrite(13, LOW);
-          delay(750);
+        
        }
-       else if ((StudentISPLFinal > 65) && (StudentISPLFinal < 70)){
+       else if ((StudentISPLFinal > 55) && (StudentISPLFinal < 65)){
           digitalWrite(11, LOW);
           digitalWrite(12, HIGH);
           digitalWrite(13, LOW);
-          delay(750);
+
        }
        else{
           digitalWrite(11, LOW);
           digitalWrite(12, LOW);
           digitalWrite(13, HIGH);
-          delay(750);
+
        }
+       delay(750);
       /*while(num<200){
         num++;
         accume += StudentISPLTest;
@@ -129,8 +130,8 @@ void loop()
       }
       TRMS1 = sqrt(TRMS1/counterTeacher++);
       TeacherISPL = 20 * log10(TRMS1 / ReferenceSoundPower) + constant1;
-      Serial.print(TeacherISPL);
-      Serial.println("xxxxxxx");
+      //Serial.print(TeacherISPL);
+      //Serial.println("xxxxxxx");
       counterTeacher = 0;
       //Serial.print(TeacherISPL);
   }
