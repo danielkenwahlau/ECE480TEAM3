@@ -85,13 +85,13 @@ void loop()
         Serial.println("Detecting student noise");
       }
       
-       if(StudentISPLFinal <= 55){
+       if(StudentISPLFinal <= 62){
           digitalWrite(11, HIGH);
           digitalWrite(12, LOW);
           digitalWrite(13, LOW);
         
        }
-       else if ((StudentISPLFinal > 55) && (StudentISPLFinal < 65)){
+       else if ((StudentISPLFinal > 62) && (StudentISPLFinal < 70)){
           digitalWrite(11, LOW);
           digitalWrite(12, HIGH);
           digitalWrite(13, LOW);
